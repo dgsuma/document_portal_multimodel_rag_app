@@ -3,38 +3,35 @@
 ## Create Project Folder and Environment Setup
 
 ```bash
-# Create a new project folder
-mkdir <project_folder_name>
+# Clone the repository (do this first)
+git clone https://github.com/dgsuma/document_portal_multimodel_rag_app.git
 
 # Move into the project folder
-cd <project_folder_name>
+cd document_portal_multimodel_rag_app
 
 # Open the folder in VS Code
 code .
 
-# Create a new Conda environment with Python 3.10
-conda create -p <env_name> python=3.10 -y
+# (Optional) Create a new Conda environment in a folder called 'env'
+conda create -p ./env python=3.10 -y
 
-# Activate the environment (use full path to the environment)
-conda activate <path_of_the_env>
+# Activate the environment (use the same path as above)
+conda activate ./env
 
 # Install dependencies from requirements.txt
 pip install -r requirements.txt
 
-# Initialize Git
+# Initialize Git (if not already initialized)
 git init
 
 # Stage all files
 git add .
 
 # Commit changes
-git commit -m "<write your commit message>"
+git commit -m "<write your commit message>"  # Replace with your commit message
 
 # Push to remote (after adding remote origin)
 git push
-
-# Cloning the repository
-git clone https://github.com/dgsuma/document_portal_multimodel_rag_app.git
 ```
 ## Minimum Requirements for the Project
 
@@ -62,6 +59,9 @@ git clone https://github.com/dgsuma/document_portal_multimodel_rag_app.git
 - [Get your API Key](https://console.groq.com/keys)  
 - [Groq Documentation](https://console.groq.com/docs/overview)
 
+### Gemini API Key
+- [Get your API Key](https://aistudio.google.com/apikey)  
+- [Gemini Documentation](https://ai.google.dev/gemini-api/docs/models)
 ### Gemini API Key
 - [Get your API Key](https://aistudio.google.com/apikey)  
 - [Gemini Documentation](https://ai.google.dev/gemini-api/docs/models)
