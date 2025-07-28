@@ -1,9 +1,10 @@
 import logging
 import os
 from datetime import datetime
-"""Streming version of the CustomLogger class with file handler."""
+import structlog
+
 class CustomLogger:
-    """Custom Logger File Handler"""
+    """Streming version of the CustomLogger class with file handler."""
     def __init__(self,log_dir="logs"):
         # Ensure logs directory exists
         self.logs_dir = os.path.join(os.getcwd(), log_dir)
