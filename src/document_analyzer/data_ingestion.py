@@ -68,7 +68,7 @@ if __name__ == "__main__":
     from pathlib import Path
     from io import BytesIO
     
-    pdf_path=r"E:\\llmops\\document_portal\\data\\document_analysis\\NIPS-2017-attention-is-all-you-need-Paper.pdf"
+    pdf_path=r"E:\\llmops\\document_portal\\data\\document_analysis\\sample.pdf"
     
     class DummyFile:
         def __init__(self,file_path):
