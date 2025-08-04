@@ -1,6 +1,8 @@
 import sys
+import uuid
 from pathlib import Path
 import fitz
+from datetime import datetime, timezone
 from logger.custom_logger import CustomLogger
 from exception.custom_exception import DocumentPortalException
 
