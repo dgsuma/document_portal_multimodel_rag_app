@@ -1,11 +1,10 @@
-import logging
 import os
+import logging
 from datetime import datetime
 import structlog
 
 class CustomLogger:
-    """Streming version of the CustomLogger class with file handler."""
-    def __init__(self,log_dir="logs"):
+    def __init__(self, log_dir="logs"):
         # Ensure logs directory exists
         self.logs_dir = os.path.join(os.getcwd(), log_dir)
         os.makedirs(self.logs_dir, exist_ok=True)
@@ -46,11 +45,13 @@ class CustomLogger:
 
         return structlog.get_logger(logger_name)
 
-# Create an instance of CustomLogger
+
+# --- Usage Example ---
 if __name__ == "__main__":
     logger = CustomLogger().get_logger(__file__)
     logger.info("User uploaded a file", user_id=123, filename="report.pdf")
     logger.error("Failed to process PDF", error="File not found", user_id=123)
+
 
 """Streaming version of the CustomLogger class with stream handler."""
 # class CustomLogger:
