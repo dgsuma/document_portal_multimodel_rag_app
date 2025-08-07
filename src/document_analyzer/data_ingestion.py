@@ -1,5 +1,6 @@
 import os
 import fitz
+import sys
 import uuid
 from datetime import datetime
 from logger.custom_logger import CustomLogger
@@ -10,8 +11,7 @@ class DocumentHandler:
     Handles PDF saving and reading operations.
     Automatically logs all actions and supports session-based organization.
     """
-    
-    def __init__(self, data_dir=None, session_id=None):
+    def __init__(self,data_dir=None,session_id=None):
         try:
             self.log=CustomLogger().get_logger(__name__)
             self.data_dir = data_dir or os.getenv(
@@ -29,14 +29,15 @@ class DocumentHandler:
 
         except Exception as e:
             self.log.error(f"Error initializing DocumentHandler: {e}")
-            raise DocumentPortalException("Error initializing DocumentHandler", e) from e
-    
-    def save_pdf(self, uploaded_file):
+            raise DocumentPortalException("Error initializing DocumentHandler", sys)
+        
+
+    def save_pdf(self,uploaded_file):
         try:
             filename = os.path.basename(uploaded_file.name)
             
             if not filename.lower().endswith(".pdf"):
-                raise DocumentPortalException("Invalid file type. Only PDFs are allowed.")
+                raise DocumentPortalException("Invalid file type. Only PDFs are allowed.",sys)
 
             save_path = os.path.join(self.session_path, filename)
             
@@ -46,15 +47,16 @@ class DocumentHandler:
             self.log.info("PDF saved successfully", file=filename, save_path=save_path, session_id=self.session_id)
             
             return save_path
+        
         except Exception as e:
             self.log.error(f"Error saving PDF: {e}")
             raise DocumentPortalException("Error saving PDF", e) from e
-    
-    def read_pdf(self, pdf_path: str)->str:
+
+    def read_pdf(self, pdf_path:str)->str:
         try:
             text_chunks = []
             with fitz.open(pdf_path) as doc:
-                for page_num, page in enumerate(doc, start=1):
+                for page_num, page in enumerate(doc, start=1): # type: ignore
                     text_chunks.append(f"\n--- Page {page_num} ---\n{page.get_text()}")
             text = "\n".join(text_chunks)
 
@@ -63,21 +65,20 @@ class DocumentHandler:
         except Exception as e:
             self.log.error(f"Error reading PDF: {e}")
             raise DocumentPortalException("Error reading PDF", e) from e
-        
+    
 if __name__ == "__main__":
     from pathlib import Path
     from io import BytesIO
     
     pdf_path=r"E:\\llmops\\document_portal\\data\\document_analysis\\sample.pdf"
-    
-    class DummyFile:
+    class DummnyFile:
         def __init__(self,file_path):
             self.name = Path(file_path).name
             self._file_path = file_path
         def getbuffer(self):
             return open(self._file_path, "rb").read()
-    
-    dummy_pdf = DummyFile(pdf_path)
+        
+    dummy_pdf = DummnyFile(pdf_path)
     
     handler = DocumentHandler()
     
@@ -91,3 +92,5 @@ if __name__ == "__main__":
         
     except Exception as e:
         print(f"Error: {e}")
+    
+    
