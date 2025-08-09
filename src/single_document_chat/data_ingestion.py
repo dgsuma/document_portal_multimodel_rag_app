@@ -30,7 +30,7 @@ class SingleDocIngestor:
             
             for uploaded_file in uploaded_files:
                 #unique_filename = f"session_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}.pdf"  # utc timestamp
-                unique_filename = f"session_{datetime.now(ZoneInfo('Australia/Sydney')).strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}"  # Sydney timezone
+                unique_filename = f"session_{datetime.now(ZoneInfo('Australia/Sydney')).strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}.pdf"  # Sydney timezone
                 temp_path=self.data_dir / unique_filename
                 
                 with open(temp_path, "wb") as f_out:

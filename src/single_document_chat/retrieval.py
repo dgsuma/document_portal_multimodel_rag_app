@@ -18,13 +18,13 @@ load_dotenv()
 
 class ConversationalRAG:
     def __init__(self, session_id: str, retriever):
-        # self.log = CustomLogger().get_logger(__name__)
-        # self.session_id = session_id
-        # self.retriever = retriever
+        self.log = CustomLogger().get_logger(__name__)
+        self.session_id = session_id
+        self.retriever = retriever
         try:
-            self.log = CustomLogger().get_logger(__name__)  
-            self.session_id = session_id       
-            self.retriever = retriever
+            # self.log = CustomLogger().get_logger(__name__)  
+            # self.session_id = session_id       
+            # self.retriever = retriever
             
             self.llm = self._load_llm()
             self.contextualize_prompt = PROMPT_REGISTRY[PromptType.CONTEXTUALIZE_QUESTION.value]
