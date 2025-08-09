@@ -3,6 +3,7 @@ import uuid
 from pathlib import Path
 import fitz
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 from logger.custom_logger import CustomLogger
 from exception.custom_exception import DocumentPortalException
 
@@ -15,7 +16,8 @@ class DocumentIngestion:
     def __init__(self, base_dir: str = "data/document_compare", session_id=None):
         self.log = CustomLogger().get_logger(__name__)
         self.base_dir = Path(base_dir)
-        self.session_id = session_id or f"session_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}"
+        #self.session_id = session_id or f"session_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}"
+        self.session_id = session_id or f"session_{datetime.now(ZoneInfo('Australia/Sydney')).strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}"
         self.session_path = self.base_dir / self.session_id
         self.session_path.mkdir(parents=True, exist_ok=True)
 
