@@ -75,6 +75,11 @@ class ConversationalRAG:
         return "\n\n".join(d.page_content for d in docs)
     
     def _build_lcel_chain(self):
+        """Build the LCEL chain for document retrieval and question answering.
+
+        Raises:
+            DocumentPortalException: If the chain building fails.
+        """
         try:
             # 1) Rewrite question using chat history
             question_rewriter = (
