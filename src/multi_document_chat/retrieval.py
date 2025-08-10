@@ -14,8 +14,22 @@ from prompt.prompt_library import PROMPT_REGISTRY
 from model.models import PromptType
 
 class ConversationalRAG:
-    def __init__(self):
-        pass
+    def __init__(self,session_id:str, retriever=None):
+        try:
+            self.log =  CustomLogger().get_logger(__name__)
+            self.session_id = session_id
+            self.llm =  self._load_llm()
+            self.contextualize_prompt: ChatPromptTemplate = PROMPT_REGISTRY[PromptType.CONTEXTUALIZE_QUESTION.value]
+            self.qa_prompt: ChatPromptTemplate = PROMPT_REGISTRY[PromptType.CONTEXT_QA.value]
+            if retriever is None:
+                raise ValueError("Retriever cannot be None")
+            self.retriever = retriever
+            self._build_lcel_chain()
+            self.log.info("ConversationalRAG initialized", session_id=self.session_id)
+            
+        except Exception as e:
+            self.log.error("Failed to initialize ConversationalRAG", error=str(e))
+            raise DocumentPortalException("Initialization error in ConversationalRAG", sys)
     
     def load_retiever_from_faiss(self):
         pass
