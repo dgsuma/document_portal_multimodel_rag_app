@@ -57,7 +57,15 @@ class ConversationalRAG:
         pass
     
     def _load_llm(self):
-        pass
+        try:
+            llm = ModelLoader().load_llm()
+            if not llm:
+                raise ValueError("LLM could not be loaded")
+            self.log.info("LLM loaded successfully", session_id=self.session_id)
+            return llm
+        except Exception as e:
+            self.log.error("Failed to load LLM", error=str(e))
+            raise DocumentPortalException("LLM loading error in ConversationalRAG", sys)
     
     
     ''' 3 type of OOP methods: class, instance and static methods. static methods can be called without an instance 
