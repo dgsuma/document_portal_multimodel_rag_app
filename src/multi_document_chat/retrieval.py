@@ -53,21 +53,83 @@ class ConversationalRAG:
             self.log.error("Failed to load retriever from FAISS", error=str(e))
             raise DocumentPortalException("Loading error in ConversationalRAG", sys)
     
-    def invoke(self):
-        pass
+    def invoke(self,user_input:str,chat_history: Optional[List[BaseMessage]] = None) ->str:
+        """
+        Args:
+            user_input (str): _description_
+            chat_history (Optional[List[BaseMessage]], optional): _description_. Defaults to None.
+        """
+        try:
+            chat_history = chat_history or []
+            payload={"input": user_input, "chat_history": chat_history}
+            answer = self.chain.invoke(payload)
+            if not answer:
+                self.log.warning("No answer generated", user_input=user_input, session_id=self.session_id)
+                return "no answer generated."
+            
+            self.log.info("Chain invoked successfully",
+                session_id=self.session_id,
+                user_input=user_input,
+                answer_preview=answer[:150],
+            )
+            return answer
+        except Exception as e:
+            self.log.error("Failed to invoke ConversationalRAG", error=str(e))
+            raise DocumentPortalException("Invocation error in ConversationalRAG", sys)
     
     def _load_llm(self):
-        pass
+        try:
+            llm = ModelLoader().load_llm()
+            if not llm:
+                raise ValueError("LLM could not be loaded")
+            self.log.info("LLM loaded successfully", session_id=self.session_id)
+            return llm
+        except Exception as e:
+            self.log.error("Failed to load LLM", error=str(e))
+            raise DocumentPortalException("LLM loading error in ConversationalRAG", sys)
     
     
     ''' 3 type of OOP methods: class, instance and static methods. static methods can be called without an instance 
     it can't access instance variables or methods. root or reusable functionality we can kept here '''
     @staticmethod
     def _format_docs(docs):
-        pass
+        return "\n\n".join(d.page_content for d in docs)
     
     def _build_lcel_chain(self):
-        pass
+        """Build the LCEL chain for document retrieval and question answering.
+
+        Raises:
+            DocumentPortalException: If the chain building fails.
+        """
+        try:
+            # 1) Rewrite question using chat history
+            question_rewriter = (
+                {"input": itemgetter("input"), "chat_history": itemgetter("chat_history")}
+                | self.contextualize_prompt
+                | self.llm
+                | StrOutputParser()
+            )
+
+            # 2) Retrieve docs for rewritten question
+            retrieve_docs = question_rewriter | self.retriever | self._format_docs
+
+            # 3) Feed context + original input + chat history into answer prompt
+            self.chain = (
+                {
+                    "context": retrieve_docs,
+                    "input": itemgetter("input"),
+                    "chat_history": itemgetter("chat_history"),
+                }
+                | self.qa_prompt
+                | self.llm
+                | StrOutputParser()
+            )
+
+            self.log.info("LCEL graph built successfully", session_id=self.session_id)
+
+        except Exception as e:
+            self.log.error("Failed to build LCEL chain", error=str(e), session_id=self.session_id)
+            raise DocumentPortalException("Failed to build LCEL chain", sys)
     
     
     
