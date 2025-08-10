@@ -72,10 +72,38 @@ class ConversationalRAG:
     it can't access instance variables or methods. root or reusable functionality we can kept here '''
     @staticmethod
     def _format_docs(docs):
-        pass
+        return "\n\n".join(d.page_content for d in docs)
     
     def _build_lcel_chain(self):
-        pass
+        try:
+            # 1) Rewrite question using chat history
+            question_rewriter = (
+                {"input": itemgetter("input"), "chat_history": itemgetter("chat_history")}
+                | self.contextualize_prompt
+                | self.llm
+                | StrOutputParser()
+            )
+
+            # 2) Retrieve docs for rewritten question
+            retrieve_docs = question_rewriter | self.retriever | self._format_docs
+
+            # 3) Feed context + original input + chat history into answer prompt
+            self.chain = (
+                {
+                    "context": retrieve_docs,
+                    "input": itemgetter("input"),
+                    "chat_history": itemgetter("chat_history"),
+                }
+                | self.qa_prompt
+                | self.llm
+                | StrOutputParser()
+            )
+
+            self.log.info("LCEL graph built successfully", session_id=self.session_id)
+
+        except Exception as e:
+            self.log.error("Failed to build LCEL chain", error=str(e), session_id=self.session_id)
+            raise DocumentPortalException("Failed to build LCEL chain", sys)
     
     
     
