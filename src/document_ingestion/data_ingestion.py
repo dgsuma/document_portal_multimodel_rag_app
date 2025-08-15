@@ -46,7 +46,20 @@ class FaissManager:
         pass
 
 class ChatIngestor:
-    pass
+    def __init__(self):
+        pass
+    def _resolve_dir(self, base: Path):
+        pass
+    def _split(self, docs: List[Document], chunk_size=1000, chunk_overlap=200) -> List[Document]:
+        """ Split documents into smaller chunks for processing """
+        pass
+    def built_retriver( self,
+        uploaded_files: Iterable,
+        *,
+        chunk_size: int = 1000,
+        chunk_overlap: int = 200,
+        k: int = 5,):
+        pass
 
 class DocHandler:
     def __init__(self):
