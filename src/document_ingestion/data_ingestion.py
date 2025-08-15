@@ -23,10 +23,27 @@ from utils.file_io import _session_id, save_uploaded_files
 from utils.document_ops import load_documents, concat_for_analysis, concat_for_comparison
 
 class FaissManager:
-    pass
+    def __init__(self, index_dir: Path, model_loader: Optional[ModelLoader] = None):
+        pass
     
-class ChatIngestor:
-    pass
+    def _exists(self)-> bool:
+        pass
+    
+    @staticmethod
+    def _fingerprint(text: str, md: Dict[str, Any]) -> str:
+        """ no duplicate entries allowed inside the faiss database """
+        pass
+    
+    def _save_meta(self):
+        pass
+    
+    def add_documents(self,docs: List[Document]):
+        """ Add documents to the FAISS index """
+        pass
+    
+    def load_or_create(self,texts:Optional[List[str]]=None, metadatas: Optional[List[dict]] = None):
+        """ Load or create a FAISS index """
+        pass
 
 class DocHandler:
     pass
