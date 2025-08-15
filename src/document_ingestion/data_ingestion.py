@@ -45,8 +45,25 @@ class FaissManager:
         """ Load or create a FAISS index """
         pass
 
-class DocHandler:
+class ChatIngestor:
     pass
 
+class DocHandler:
+    def __init__(self):
+        pass
+    def save_pdf(self, uploaded_file) -> str:
+        pass
+    def read_pdf(self, pdf_path: str) -> str:
+        pass
+
 class DocumentComparator:
-    pass
+    def __init__(self):
+        pass
+    def save_uploaded_files(self, reference_file, actual_file):
+        pass
+    def read_pdf(self, pdf_path: Path) -> str:
+        pass
+    def combine_documents(self) -> str:
+        pass
+    def clean_old_sessions(self, keep_latest: int = 3):
+        pass
