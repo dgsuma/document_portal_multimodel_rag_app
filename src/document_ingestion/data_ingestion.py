@@ -56,15 +56,43 @@ class FaissManager:
         return hashlib.sha256(text.encode("utf-8")).hexdigest()
     
     def _save_meta(self):
-        pass
+        self.meta_path.write_text(json.dumps(self._meta, ensure_ascii=False, indent=2), encoding="utf-8")
     
     def add_documents(self,docs: List[Document]):
         """ Add documents to the FAISS index """
-        pass
+        if self.vs is None:
+            raise RuntimeError("Call load_or_create() before add_documents_idempotent().")
+        
+        new_docs: List[Document] = []
+        
+        for d in docs:
+            key = self._fingerprint(d.page_content, d.metadata or {})  ## sanity check done here
+            if key in self._meta["rows"]:
+                continue
+            self._meta["rows"][key] = True
+            new_docs.append(d)
+            
+        if new_docs:
+            self.vs.add_documents(new_docs)
+            self.vs.save_local(str(self.index_dir))
+            self._save_meta()
+        return len(new_docs)
     
     def load_or_create(self,texts:Optional[List[str]]=None, metadatas: Optional[List[dict]] = None):
         """ Load or create a FAISS index """
-        pass
+        if self._exists():
+            self.vs = FAISS.load_local(
+                str(self.index_dir),
+                embeddings=self.emb,
+                allow_dangerous_deserialization=True,
+            )
+            return self.vs
+        if not texts:
+            raise DocumentPortalException("No existing FAISS index and no data to create one", sys)
+        
+        self.vs = FAISS.from_texts(texts=texts, embedding=self.emb, metadatas=metadatas or [])
+        self.vs.save_local(str(self.index_dir))
+        return self.vs
 
 class ChatIngestor:
     def __init__(self):
