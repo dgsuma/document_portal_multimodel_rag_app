@@ -31,13 +31,13 @@ class FaissManager:
         self.index_dir.mkdir(parents=True, exist_ok=True)
         
         self.meta_path = self.index_dir / "ingested_meta.json"
-        self._meta: Dict[str, Any] = {"rows": {}}
+        self._meta: Dict[str, Any] = {"rows": {}}  ## this is dict of rows
         
         if self.meta_path.exists():
             try:
                 self._meta = json.loads(self.meta_path.read_text(encoding="utf-8")) or {"rows": {}}
             except Exception:
-                self._meta = {"rows": {}}
+                self._meta = {"rows": {}}  ## init the empty one, if does not exists
         
         self.model_loader = model_loader or ModelLoader()
         self.emb = self.model_loader.load_embeddings()
@@ -79,7 +79,7 @@ class FaissManager:
         return len(new_docs)
     
     def load_or_create(self,texts:Optional[List[str]]=None, metadatas: Optional[List[dict]] = None):
-        """ Load or create a FAISS index """
+        """ if its running first time, then it will not go in this block """
         if self._exists():
             self.vs = FAISS.load_local(
                 str(self.index_dir),
@@ -126,10 +126,10 @@ class ChatIngestor:
         
     def _resolve_dir(self, base: Path):
         if self.use_session:
-            d = base / self.session_id
-            d.mkdir(parents=True, exist_ok=True)
+            d = base / self.session_id  ## e.g. "faiss_index/abc123"
+            d.mkdir(parents=True, exist_ok=True) ## creates dir if not exists
             return d
-        return base
+        return base   ## fallback: "faiss_index/"
         
     def _split(self, docs: List[Document], chunk_size=1000, chunk_overlap=200) -> List[Document]:
         splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
@@ -150,6 +150,7 @@ class ChatIngestor:
                 raise ValueError("No valid documents loaded")
             
             chunks = self._split(docs, chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+            ## FAISS manager very very important class for the documentchat
             fm = FaissManager(self.faiss_dir, self.model_loader)
             
             texts = [c.page_content for c in chunks]
