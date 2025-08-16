@@ -22,17 +22,38 @@ from exception.custom_exception import DocumentPortalException
 from utils.file_io import _session_id, save_uploaded_files
 from utils.document_ops import load_documents, concat_for_analysis, concat_for_comparison
 
+SUPPORTED_EXTENSIONS = {".pdf", ".docx", ".txt"}
+
+# FAISS Manager (load-or-create)
 class FaissManager:
     def __init__(self, index_dir: Path, model_loader: Optional[ModelLoader] = None):
-        pass
+        self.index_dir = Path(index_dir)
+        self.index_dir.mkdir(parents=True, exist_ok=True)
+        
+        self.meta_path = self.index_dir / "ingested_meta.json"
+        self._meta: Dict[str, Any] = {"rows": {}}
+        
+        if self.meta_path.exists():
+            try:
+                self._meta = json.loads(self.meta_path.read_text(encoding="utf-8")) or {"rows": {}}
+            except Exception:
+                self._meta = {"rows": {}}
+        
+        self.model_loader = model_loader or ModelLoader()
+        self.emb = self.model_loader.load_embeddings()
+        self.vs: Optional[FAISS] = None
     
     def _exists(self)-> bool:
-        pass
+        return (self.index_dir / "index.faiss").exists() and (self.index_dir / "index.pkl").exists()
     
     @staticmethod
     def _fingerprint(text: str, md: Dict[str, Any]) -> str:
-        """ no duplicate entries allowed inside the faiss database """
-        pass
+        """ no duplicate entries allowed inside the faiss database (eleminate de-duplicate) """
+        src = md.get("source") or md.get("file_path")
+        rid = md.get("row_id")
+        if src is not None:
+            return f"{src}::{'' if rid is None else rid}"
+        return hashlib.sha256(text.encode("utf-8")).hexdigest()
     
     def _save_meta(self):
         pass
