@@ -1,7 +1,6 @@
 faiss_db:
   collection_name: "document_portal"
 
-
 embedding_model:
   provider: "google"
   model_name: "models/text-embedding-004"
@@ -20,4 +19,22 @@ llm:
     provider: "google"
     model_name: "gemini-2.0-flash"
     temperature: 0
+    max_output_tokens: 2048
+
+  together:
+    provider: "together"
+    model_name: "mistralai/Mixtral-8x7B-Instruct-v0.1"
+    temperature: 0.2
+    max_output_tokens: 2048
+
+  ollama:
+    provider: "ollama"
+    model_name: "llama3"
+    temperature: 0.2
+    max_output_tokens: 2048
+
+  huggingface:
+    provider: "huggingface"
+    model_name: "mistralai/Mistral-7B-Instruct-v0.2"
+    temperature: 0.2
     max_output_tokens: 2048
