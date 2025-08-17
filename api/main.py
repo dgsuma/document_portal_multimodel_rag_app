@@ -10,13 +10,13 @@ from pathlib import Path
 from src.document_ingestion.data_ingestion import (
     DocHandler,
     DocumentComparator,
-    ChatIngestor,
-    FaissManager,
+    ChatIngestor
 )
 
 from src.document_analyzer.data_analysis import DocumentAnalyzer
 from src.document_compare.document_comparator import DocumentComparatorLLM
 from src.document_chat.retrieval import ConversationalRAG
+from utils.document_ops import FastAPIFileAdapter, read_pdf_via_handler
 
 FAISS_BASE = os.getenv("FAISS_BASE", "faiss_index")
 UPLOAD_BASE = os.getenv("UPLOAD_BASE", "data")
@@ -38,10 +38,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+#----------- Homepage ----------
 @app.get("/", response_class=HTMLResponse)
 async def serve_ui(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
+#----------- Health Check ----------
 @app.get("/health")
 def health() -> Dict[str, str]:
     return {"status": "ok", "service": "document-portal"}
@@ -52,10 +54,10 @@ async def analyze_document(file: UploadFile = File(...)) -> Any:
     try:
         dh = DocHandler()
         saved_path = dh.save_pdf(FastAPIFileAdapter(file))
-        text = _read_pdf_via_handler(dh, saved_path)
+        text = read_pdf_via_handler(dh, saved_path)
         analyzer = DocumentAnalyzer()
         result = analyzer.analyze_document(text)
-        return JSONResponse(content=result)
+        return JSONResponse(content=result)  ## better write a pydatic class for validation
     except HTTPException:
         raise
     except Exception as e:
@@ -69,7 +71,7 @@ async def compare_documents(reference: UploadFile = File(...), actual: UploadFil
         ref_path, act_path = dc.save_uploaded_files(
             FastAPIFileAdapter(reference), FastAPIFileAdapter(actual)
         )
-        _ = ref_path, act_path
+        _ = ref_path, act_path ## these two paths we are not gonna use actively, that's why kept it as _
         combined_text = dc.combine_documents()
         comp = DocumentComparatorLLM()
         df = comp.compare_documents(combined_text)
@@ -138,24 +140,7 @@ async def chat_query(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Query failed: {e}")
-    
-# ---------- Helpers ----------
-class FastAPIFileAdapter:
-    """Adapt FastAPI UploadFile -> .name + .getbuffer() API"""
-    def __init__(self, uf: UploadFile):
-        self._uf = uf
-        self.name = uf.filename
-    def getbuffer(self) -> bytes:
-        self._uf.file.seek(0)
-        return self._uf.file.read()
-
-def _read_pdf_via_handler(handler: DocHandler, path: str) -> str:
-    if hasattr(handler, "read_pdf"):
-        return handler.read_pdf(path)  # type: ignore
-    if hasattr(handler, "read_"):
-        return handler.read_(path)  # type: ignore
-    raise RuntimeError("DocHandler has neither read_pdf nor read_ method.")
-    
+        
     
 # command for executing the fast api
 # uvicorn api.main:app --port 8083 --reload    
