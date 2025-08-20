@@ -66,7 +66,7 @@ class FaissManager:
         new_docs: List[Document] = []
         
         for d in docs:
-            key = self._fingerprint(d.page_content, d.metadata or {})  ## sanity check done here
+            key = self._fingerprint(d.page_content, d.metadata or {})  ## sanity check done here, unique ID to my data
             if key in self._meta["rows"]:
                 continue
             self._meta["rows"][key] = True
