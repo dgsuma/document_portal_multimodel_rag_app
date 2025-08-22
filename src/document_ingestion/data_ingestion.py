@@ -48,7 +48,9 @@ class FaissManager:
     
     @staticmethod
     def _fingerprint(text: str, md: Dict[str, Any]) -> str:
-        """ no duplicate entries allowed inside the faiss database (eleminate de-duplicate) """
+        """ No duplicate entries allowed inside the faiss database (eleminate de-duplicate) 
+        This approach is robust and well-suited for its stated purpose: ensuring that a FAISS database contains 
+        only unique entries by providing a reliable way to identify duplicates before insertion"""
         src = md.get("source") or md.get("file_path")
         rid = md.get("row_id")
         if src is not None:
