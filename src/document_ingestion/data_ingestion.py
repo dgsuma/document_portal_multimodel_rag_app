@@ -61,14 +61,14 @@ class FaissManager:
         self.meta_path.write_text(json.dumps(self._meta, ensure_ascii=False, indent=2), encoding="utf-8")
     
     def add_documents(self,docs: List[Document]):
-        """ Add documents to the FAISS index """
+        """ Add documents to the FAISS index. these two methods _fingerprint() & add_documents() are dealing with deduplication"""
         if self.vs is None:
             raise RuntimeError("Call load_or_create() before add_documents_idempotent().")
         
         new_docs: List[Document] = []
         
         for d in docs:
-            key = self._fingerprint(d.page_content, d.metadata or {})  ## sanity check done here, unique ID to my data
+            key = self._fingerprint(d.page_content, d.metadata or {})  ## sanity check done here, unique ID for avoid data duplicacy
             if key in self._meta["rows"]:
                 continue
             self._meta["rows"][key] = True
