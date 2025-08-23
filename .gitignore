@@ -7,5 +7,5 @@ __pycache__/
 logs/
 *.pyc
 test.py
-data
+data/
 faiss_index/
