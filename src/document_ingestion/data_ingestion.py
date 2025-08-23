@@ -35,7 +35,7 @@ class FaissManager:
         
         if self.meta_path.exists():
             try:
-                self._meta = json.loads(self.meta_path.read_text(encoding="utf-8")) or {"rows": {}}
+                self._meta = json.loads(self.meta_path.read_text(encoding="utf-8")) or {"rows": {}} # load it if already there
             except Exception:
                 self._meta = {"rows": {}}  ## init the empty one, if does not exists
         
@@ -81,7 +81,7 @@ class FaissManager:
         return len(new_docs)
     
     def load_or_create(self,texts:Optional[List[str]]=None, metadatas: Optional[List[dict]] = None):
-        """ if its running first time, then it will not go in this block """
+        """ if we running first time, then it will not go in this block """
         if self._exists():
             self.vs = FAISS.load_local(
                 str(self.index_dir),
@@ -152,6 +152,7 @@ class ChatIngestor:
                 raise ValueError("No valid documents loaded")
             
             chunks = self._split(docs, chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+            
             ## FAISS manager very very important class for the documentchat
             fm = FaissManager(self.faiss_dir, self.model_loader)
             

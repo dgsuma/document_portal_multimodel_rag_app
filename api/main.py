@@ -93,6 +93,8 @@ async def chat_build_index(
 ) -> Any:
     try:
         wrapped = [FastAPIFileAdapter(f) for f in files]
+        # this is my main class for storing a data into Vector DB
+        # created an object of ChatIngestor
         ci = ChatIngestor(
             temp_base = UPLOAD_BASE,
             faiss_base = FAISS_BASE,
